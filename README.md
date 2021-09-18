@@ -68,6 +68,14 @@ func main() {
         fmt.Println(a.Get(i))
     }
     //输出: "hello" "kson" map[db:true db2:false]
+    obj.Set("datas", 1234567890)
+    //修改datas
+    obj.Set("arr",
+            NewArray().Append(
+                NewObject().Set("asd", "bbbccdd"),
+                NewObject().Set("bbb", 123)),
+     )
+    //在obj里添加一个object => {"arr": [{"asd": "bbbccdd"},{"bbb": 123}]} 
 }
 
 ```

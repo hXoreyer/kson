@@ -1,6 +1,8 @@
 package kson
 
 import (
+	"encoding/json"
+	"os"
 	"strconv"
 
 	"github.com/hxoreyer/ktry"
@@ -38,7 +40,12 @@ func (k *kObject) GetInt(key interface{}) int64 {
 	ktry.Try(func() {
 		ret = int64(k.value[key.(string)].(float64))
 	}).CatchAll(func(err error) {
-		ret, _ = strconv.ParseInt(k.value[key.(string)].(string), 10, 64)
+		ktry.Try(
+			func() {
+				ret, _ = strconv.ParseInt(k.value[key.(string)].(string), 10, 64)
+			}).CatchAll(func(err error) {
+			ret = int64(k.value[key.(string)].(int))
+		})
 	}).Finally()
 	return ret
 }
@@ -73,4 +80,44 @@ func (k *kObject) Get(key interface{}) interface{} {
 
 func (k *kObject) Length() int {
 	return len(k.value)
+}
+
+func (k *kObject) Set(key interface{}, val interface{}) Kson {
+	ktry.Try(func() {
+		k.value[key.(string)] = (val).(Kson).get()
+	}).CatchAll(func(err error) {
+		k.value[key.(string)] = val
+	})
+	return k
+}
+
+func (k *kObject) Append(val ...interface{}) Kson {
+	panic("object can not append")
+}
+
+func (k *kObject) SaveAsFile(filename string) {
+	f, err := os.Create(filename)
+	if err != nil {
+		panic(err)
+	}
+
+	if err = json.NewEncoder(f).Encode(k.value); err != nil {
+		panic(err)
+	}
+}
+
+func (k *kObject) SaveAsBytes() ([]byte, error) {
+	js, err := json.Marshal(k.value)
+	if err != nil {
+		return nil, err
+	}
+	return js, nil
+}
+
+func (k *kObject) SaveAsMap() map[string]interface{} {
+	return k.value
+}
+
+func (k *kObject) get() interface{} {
+	return k.value
 }

@@ -66,3 +66,38 @@ func (k *kArray) Get(key interface{}) interface{} {
 func (k *kArray) Length() int {
 	return len(k.value)
 }
+
+func (k *kArray) Set(key interface{}, val interface{}) Kson {
+	ktry.Try(func() {
+		k.value[key.(int)] = (val).(Kson).get()
+	}).CatchAll(func(err error) {
+		k.value[key.(int)] = val
+	})
+	return k
+}
+
+func (k *kArray) Append(val ...interface{}) Kson {
+	ktry.Try(func() {
+		for _, v := range val {
+			k.value = append(k.value, (v).(Kson).get())
+		}
+	}).CatchAll(func(err error) {
+		k.value = append(k.value, val)
+	})
+	return k
+}
+
+func (k *kArray) SaveAsFile(filename string) {
+	panic("array can not be marshal")
+}
+func (k *kArray) SaveAsBytes() ([]byte, error) {
+	panic("array can not be marshal")
+}
+
+func (k *kArray) SaveAsMap() map[string]interface{} {
+	panic("array can not be marshal")
+}
+
+func (k *kArray) get() interface{} {
+	return k.value
+}

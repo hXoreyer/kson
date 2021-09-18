@@ -1,4 +1,4 @@
-module github.com/hxoreyer/kson
+module kson
 
 go 1.16
 
